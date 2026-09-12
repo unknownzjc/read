@@ -33,7 +33,7 @@ Neubig 在课堂上先让学生自己举例，再点破：这两个例子恰好�
 
 往更细的方向展开（[2:54](https://www.youtube.com/watch?v=jXChFB4JSyw&t=174s)），这两大收益具体对应四类典型用途：其一，**查询当前信息（look up current information）**，好处是为回答提供"新鲜的证据（fresh evidence）"来 grounding（接地），避免模型凭过时记忆编造；其二，**精确计算（exact computation）**，用计算器或 Python 执行，比模型自身推理更快更可靠；其三，**访问私有状态（private states）**，让模型拿到关于用户的信息，从而基于用户状态作答；其四，**改变外部环境**，比如通过浏览网页或调 API 在真实世界里产生副作用。这四类几乎覆盖了今天所有智能体产品的工具需求。
 
-![Benefits of tools：Extend 访问模型参数之外的信息与动作，Facilitate 用计算器等工具替代模型的冗长推理（视频 1:40）](shots2/benefits.png)
+![Benefits of tools：Extend 访问模型参数之外的信息与动作，Facilitate 用计算器等工具替代模型的冗长推理（视频 1:40）](shots/02/benefits.png)
 
 ### 3. 从 ChatGPT 的演变看工具生态的扩张 [3:33](https://www.youtube.com/watch?v=jXChFB4JSyw&t=213s)
 
@@ -60,7 +60,7 @@ Neubig 给出了一份他认为最具代表性的工具清单，绝大多数其�
 - **图像生成（image generation）**：与前面几类有个微妙差异——前面那些主要和文本打交道，而这个是和图像打交道。Neubig 指出了一个鲜为人知的细节：调用图像生成工具时，**一大半功夫花在"决定把什么 query 送进生成器"上**。语言模型会把用户的请求大幅扩写（比如用户只说画个机器人，最终生成的却是"水彩风格的、在图书馆里学习的机器人"，与原始 query 并不相同）。旧版 ChatGPT 下载图片时能看到一个与用户输入截然不同的 caption，可以借此窥见模型实际发给图像生成器的 query。
 - **自定义函数（custom functions）**：比如"帮我买香蕉、牛奶和咖啡"——模型可以为你创建一个购物车并调用 Instacart 的 API。这一类是开放式的："you can basically go as wild as you want"，想加多野的工具都可以。
 
-![Textual responses：finish(text) 作为结束智能体循环的控制动作（harness control action），而非外部程序（视频 6:30）](shots2/tool-taxonomy.png)
+![Textual responses：finish(text) 作为结束智能体循环的控制动作（harness control action），而非外部程序（视频 6:30）](shots/02/tool-taxonomy.png)
 
 ### 5. 两种工具调用观：API 列表 vs. 代码即"元工具" [10:20](https://www.youtube.com/watch?v=jXChFB4JSyw&t=620s)
 
@@ -70,7 +70,7 @@ Neubig 给出了一份他认为最具代表性的工具清单，绝大多数其�
 
 这不只是理论美感，有实验证据支撑。三四年前人们刚开始用 LLM 搭建智能体时，标准做法是一步步调 API：比如要回答"在美、日、德、印四国中，买某款手机最划算的是哪个国家"，老办法需要反复调用 lookup rates（查汇率）、lookup phone price（查价格）、convert and tax（换算加税）……一步步循环很多轮才能"finally get the result"。而写成代码的话，**一个程序就能完成全部流程**——既是更丰富的表达，也是更高效的方式。这就是 CodeAct（Wang et al., ICML 2024；口述转写听起来像 "Kodak"，实为 CodeAct）这篇论文的方法，其核心结果是双重的：**成功率上升，同时平均交互轮数下降**。尤其值得注意的是，这个收益连传统上不需要代码的任务也能拿到——这些任务本来被视为普通工具调用任务，但代码恰好是一种更好的表达媒介（"code is just a good medium for how you would do this"）。
 
-![CodeAct results：在展示的子集中，代码作为动作（Code as Action）在 8/8 个模型上取得最高成功率；交互轮数在 7/8 模型上最少，全部 17 个模型上两项计数均为 12/17（视频 14:00）](shots2/codeact-results.png)
+![CodeAct results：在展示的子集中，代码作为动作（Code as Action）在 8/8 个模型上取得最高成功率；交互轮数在 7/8 模型上最少，全部 17 个模型上两项计数均为 12/17（视频 14:00）](shots/02/codeact-results.png)
 
 ### 6. 代码调用的代价：权力越大，风险越大 [14:20](https://www.youtube.com/watch?v=jXChFB4JSyw&t=860s)
 
@@ -115,7 +115,7 @@ Neubig 强调：本质上这些方案都可行（"any of these works"）；用�
 
 有学生追问微调（fine-tuning）时新增功能、保持泛化性的做法，回答是：如果你在一个已经训练好的模型上微调，**百分之百要匹配它原有的工具调用格式**（"you 100% want to match the tool call format"），不要试图让它学一套它没训练过的格式（"you don't want to try to get it to do something it wasn't trained on"）。好消息是这一切在 Hugging Face 里已经通过 `apply_chat_template` 函数标准化了——你只要对所用的模型调用正确的 chat template 即可；如果某个模型的 template 实现有问题，可以去社区提、他们修，或者自己动手。如今这"全部已经标准化了"，但他坚持学生要了解这些底层机制："I want people to know that this is going on under the hood, because if you don't know this, you can make mistakes and it will not be happy."——标准化工具屏蔽了复杂性，却没有消除复杂性；出问题时，懂底层的人才有排查的抓手。
 
-![Same tool call, different model protocols：同一个 get_weather 调用在 Qwen、Mistral、DeepSeek 三种协议下的序列化对比——一份 schema，各自不同的序列化与解析（视频 21:40）](shots2/tool-formats.png)
+![Same tool call, different model protocols：同一个 get_weather 调用在 Qwen、Mistral、DeepSeek 三种协议下的序列化对比——一份 schema，各自不同的序列化与解析（视频 21:40）](shots/02/tool-formats.png)
 
 ### 10. 工具的分发、校验与结果配对 [23:29](https://www.youtube.com/watch?v=jXChFB4JSyw&t=1409s)
 
@@ -140,7 +140,7 @@ Neubig 强调：本质上这些方案都可行（"any of these works"）；用�
 
 这套理论落到系统里就是 **XGrammar**——一个在各大 LLM 推理库中广泛使用的约束解码引擎，由 CMU 机器学习系的人开发（slide 标注 Dong et al., MLSys 2025）。做法是在解码的每一步：LLM 给出下一个 token 的 logits（原始打分），同时用文法检查每个候选 token 在当前栈状态下是否合法——合法得 1 分、非法得 0 分，**把所有非法 token 的 logits 置为负无穷，再重新归一化**，于是概率只分布在合法 token 上。XGrammar 论文里还有精巧的工程优化：词表中有些 token 在任何上下文下都恒合法或恒非法，可以预先计算（precompute）；只有那些"取决于栈上下文"的 token 才需要实时计算（calculate on the fly）。效果是：只要开启约束解码并配上正确的 JSON Schema，**你几乎必然得到格式良好的工具调用**。
 
-![Token masking：LLM 推理产出 logits，结构（文法）与既有输出共同生成逐 token 掩码，非法 token 被屏蔽后再归一化采样——XGrammar, Dong et al., MLSys 2025（视频 33:30）](shots2/xgrammar.png)
+![Token masking：LLM 推理产出 logits，结构（文法）与既有输出共同生成逐 token 掩码，非法 token 被屏蔽后再归一化采样——XGrammar, Dong et al., MLSys 2025（视频 33:30）](shots/02/xgrammar.png)
 
 但有一个约束解码也救不了的边角案例，Neubig 把它当课堂测验问出来（"very very difficult"）：**token 预算耗尽**。模型能生成的 token 数有上限，可能生成到一半时你还走在自动机的合法路径上、却不在终态——输出是半个 JSON（"you generate like part of a JSON output"）。他自己实际踩到过这个坑。理论上有解法——实时数着剩余 token 预算、在不足以走完合法路径时提前截断——但还没人实现；他当场表示谁愿意在 XGrammar 里实现这个功能可以算作额外学分（extra credit assignment）。
 
@@ -158,13 +158,13 @@ Neubig 强调：本质上这些方案都可行（"any of these works"）；用�
 
 但他随后给出了让 MCP 区别于"裸调 API"的关键理由：**多一层安全边界（an extra layer of security）**。MCP 架构里有两把钥匙——**MCP API key** 提供给运行智能体的进程，用于认证进入 MCP server；**上游 API key（upstream API key）**（比如你的 GitHub token）只提供给 MCP server，**绝不交给智能体**。为什么这至关重要？设想你把 GitHub token 直接给了智能体，而它某天"觉得"把 token 推送到你的公开仓库是个好主意——"not good, right?"——账号立刻失守，恶意代码可能被装进你所有的仓库。所以正确的设计是：给智能体一个**泄露了也相对无害**的凭证（"relatively harmless"），真正的凭证被隔在 MCP server 后面得到保全。
 
-![Start MCP with separate credentials：FastMCP 代码示例，UPSTREAM_API_KEY 用于授权上游 API 调用，MCP_API_KEY 用于保护 MCP 端点；静态 token 仅供教学开发，生产环境应校验 JWT 或用 OAuth（视频 42:25）](shots2/mcp-keys.png)
+![Start MCP with separate credentials：FastMCP 代码示例，UPSTREAM_API_KEY 用于授权上游 API 调用，MCP_API_KEY 用于保护 MCP 端点；静态 token 仅供教学开发，生产环境应校验 JWT 或用 OAuth（视频 42:25）](shots/02/mcp-keys.png)
 
 配套生态上，他提到 **FastMCP** 库——"MCP 界的 FastAPI"（"basically designed to be FastAPI for MCP"）：想给任何东西建 MCP server，基本把 FastAPI 换成 FastMCP 即可，甚至可以直接把已有 REST API 生成的 spec 转成 MCP。此外还有一个**官方 MCP registry（注册表）**可以查找现成的 MCP，外加"一百五十万个"按人气排名的第三方 MCP 服务导航站。
 
 总结对比（slide 标题为 *REST APIs and MCP: shared schemas, different contracts*）：两者都能给智能体挂上一组 API，都用名字、描述和 JSON Schema 表达结构化输入；差异在于——**发现（discovery）**：REST 要去抓取一份 OpenAPI 文档，MCP 则有专门的 API 在运行时列出全部工具（`tools/list`）；**调用（invocation）**：REST 走 HTTP，MCP 走自己的 transport（可以是标准输入输出 stdio，也可以是 socket 等）；**认证**：如上所述的双层 key；另外 MCP 还附带资源（resources）、提示词（prompts）、扩展（extensions）等便利设施，课程未展开。
 
-![REST APIs and MCP：shared schemas, different contracts——OpenAPI 描述一个 web API，MCP 标准化 AI 宿主如何发现与调用能力（视频 43:20）](shots2/api-vs-mcp.png)
+![REST APIs and MCP：shared schemas, different contracts——OpenAPI 描述一个 web API，MCP 标准化 AI 宿主如何发现与调用能力（视频 43:20）](shots/02/api-vs-mcp.png)
 
 课间他插播了一个花絮：这几讲反复用"Pittsburgh 天气"举例，而当天 Pittsburgh 真的出现了**一边暴雨一边出太阳**的天气——他自己的示例 API 无法同时返回两种天气状态，"我成功把自己的 API 搞崩了"（"I managed to break my own API"）。
 

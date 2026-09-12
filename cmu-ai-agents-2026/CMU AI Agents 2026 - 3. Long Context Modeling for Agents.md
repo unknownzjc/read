@@ -31,7 +31,7 @@ Neubig 开场说，他本想把这讲命名为"长上下文 LLM 的上下文管�
 - **20%：工具调用**——写代码、读代码等动作。
 - **37%：工具结果**——读文件等操作返回的内容，是最大的一块。
 
-![Agent prompt composition example：1,500 个 OpenHands 会话平均每会话 77,922 token；37% 是工具结果，23% 是系统提示与工具描述（视频 2:50）](shots3/prompt-composition.png)
+![Agent prompt composition example：1,500 个 OpenHands 会话平均每会话 77,922 token；37% 是工具结果，23% 是系统提示与工具描述（视频 2:50）](shots/03/prompt-composition.png)
 
 这张构成图的信息量很大：真正"用户意图"只占 9%，而**环境反馈（工具结果）和系统框架（提示+工具）合起来占了 60%**。每一步都包含所有这些成分，累积速度极快——这正是二次方膨胀在真实数据上的样子。
 
@@ -55,7 +55,7 @@ Neubig 开场说，他本想把这讲命名为"长上下文 LLM 的上下文管�
 - **Throughput（吞吐）**：完成的 token 或请求数除以墙上时钟时间，是系统级整体指标。
 - **Cost（成本）**。
 
-![Serving metrics：TTFT 是请求到达到首 token 的时间，TPOT 是相邻输出 token 的间隔；另有 Throughput 与 Cost（DistServe, OSDI 2024）（视频 8:10）](shots3/serving-metrics.png)
+![Serving metrics：TTFT 是请求到达到首 token 的时间，TPOT 是相邻输出 token 的间隔；另有 Throughput 与 Cost（DistServe, OSDI 2024）（视频 8:10）](shots/03/serving-metrics.png)
 
 他还指出一个产品维度的权衡：**交互式智能体**（你在 coding CLI 里与它结对工作）极度在乎 TTFT 和 TPOT；而**后台智能体**（隔夜跑的批任务）几乎不在乎延迟，只在乎吞吐和成本。他自己公司也对外服务编程智能体，推理服务商常问他"你更在乎哪一个"，以便针对性优化系统——吞吐、成本、速度之间存在真实的三方权衡。
 
@@ -63,7 +63,7 @@ Neubig 开场说，他本想把这讲命名为"长上下文 LLM 的上下文管�
 
 讲完效率，转向有效性：就算服务系统吃得下一百万 token，**模型未必能有效利用这一百万 token**。经典例证是"大海捞针"评测（needle-in-a-haystack）：往 Paul Graham（Y Combinator 创始人）的一堆文章里塞一句"旧金山吃三明治最好的地方是某处"，然后问模型这句话在哪。随着上下文越拉越长、插入位置变化，较弱的模型在超长上下文上开始出错。课程展示的 GPT-4 评测图（Kamradt, 2023）显示：当事实被插在文档 10%–50% 深度且上下文很长时，检索准确率开始退化。这一类的常用基准还有 **RULER** 和 **HELMET**。
 
-![Advertised vs. effective context：GPT-4 大海捞针评测，长上下文+特定插入深度时检索准确率退化（Kamradt, 2023）（视频 12:20）](shots3/needle-haystack.png)
+![Advertised vs. effective context：GPT-4 大海捞针评测，长上下文+特定插入深度时检索准确率退化（Kamradt, 2023）（视频 12:20）](shots/03/needle-haystack.png)
 
 Neubig 随后让学生现身说法："你们长时间用智能体时见过什么失败模式？"学生的回答集中在**遗忘**：忘了之前的上下文；有学生说"我在对话中间明确告诉它不要做某件事，它转头就做了"。Neubig 补充了一个更恶劣的例子（Daniel 在课上讲过的）：用户明确说"不要删除这个"，智能体还是删了——因为它把上下文忘了。在智能体场景这尤其危险，因为用户的指令是增量式给出的，每一条都可能在后续步骤中被遗忘，而智能体的动作是有真实副作用的。
 
@@ -84,7 +84,7 @@ Neubig 随后让学生现身说法："你们长时间用智能体时见过什么
 | Inkling-Small | 512-token 窗口 | dense GQA | 35:7 = 5:1 |
 | DeepSeek-V4-Pro-0813 | 128-token 窗口分支 | 压缩稀疏/dense | 交错分支 |
 
-![Long-context hybrid architectures：六个开源模型的局部/全局计算组合与层数配比（视频 18:45）](shots3/hybrid-models.png)
+![Long-context hybrid architectures：六个开源模型的局部/全局计算组合与层数配比（视频 18:45）](shots/03/hybrid-models.png)
 
 结论：行业标准做法就是"局部机制 + 稀疏或稠密全局注意力"的混合体，局部与全局层数比例集中在 3:1 到 5:1。接下来逐机制讲解，深度控制在"以后查论文时能看懂"的水平。
 
@@ -106,11 +106,11 @@ Neubig 随后让学生现身说法："你们长时间用智能体时见过什么
 
 但换来一个巨大的好处：**结合律（associativity）**。去掉 softmax 后，求和可以重新结合，把"所有历史 key-value 外积的累加"压缩成一个**状态矩阵 S**。这个状态矩阵本质上是一个从 query 映射到 value 的线性函数——注意力本来也是这样一个映射，所以二者功能同构。关键优势：S 可以**增量更新**，每来一个新 token 只需常数时间更新 S（S_t = S_{t-1} + k_t v_tᵀ），整个机制变成一个**循环神经网络（RNN）**，复杂度从 O(n²) 直接降到 O(n)——连窗口 w 都没有了，因为每步只依赖上一步的状态。
 
-![Linear attention：去掉 softmax 后用结合律把历史压缩成固定大小的状态矩阵 S（Transformers are RNNs · Katharopoulos et al., ICML 2020）（视频 22:50）](shots3/linear-attention.png)
+![Linear attention：去掉 softmax 后用结合律把历史压缩成固定大小的状态矩阵 S（Transformers are RNNs · Katharopoulos et al., ICML 2020）（视频 22:50）](shots/03/linear-attention.png)
 
 **DeltaNet** 在此基础上修复表达力。直觉是：把状态矩阵当作"对 value 的预测器"。给定当前 key k_t，用旧矩阵 S_{t-1} 预测出 v̂_t = S_{t-1}ᵀk_t；真实 value v_t 与预测的差就是**误差 e_t**；然后按 **delta 规则**更新：S_t = S_{t-1} + β_t k_t e_tᵀ——沿 k_t 方向修正矩阵，使得"长得像 k_t 的 query"下次能输出想要的 value。β 类似学习率，防止一步更新过猛。这样的修正是**定向的**（targeted correction）：只沿当前 key 的方向纠偏，不相关的记忆不受影响。
 
-![DeltaNet：先读出当前关联，再只写入预测误差（Linear Transformers Are Secretly Fast Weight Programmers · Schlag et al., ICML 2021）（视频 26:50）](shots3/deltanet.png)
+![DeltaNet：先读出当前关联，再只写入预测误差（Linear Transformers Are Secretly Fast Weight Programmers · Schlag et al., ICML 2021）（视频 26:50）](shots/03/deltanet.png)
 
 **Gated DeltaNet** 再加一个**衰减项（decay）**：每个时间步把矩阵乘以 α_t 再写入新内容。原因是线性注意力没有机制阻止"很远的上下文"干扰当前预测——很久以前一个奇怪的 key 可能一直在状态里作妖。衰减让远过去的信息逐步打折扣，衰减越强遗忘越快，机制就越"局部"。Gated DeltaNet 正是 Qwen 模型采用的方案。而 GLM 和 Kimi 用了更有表达力的版本 **KDA（Kimi Delta Attention）**：**逐元素衰减**——状态矩阵的每个元素以不同速度衰减，于是一部分上下文可以保留很久，另一部分快速消逝。Mamba 思路类似但数学更复杂，本讲略过（在语言模型系统课里讲过）。
 
@@ -166,7 +166,7 @@ Neubig 随后让学生现身说法："你们长时间用智能体时见过什么
 
 **价格端更直观**：Neubig 从各家官方定价扒了数据（USD/1M token，2026-08-30 核价）——DeepSeek V4 Flash 缓存输入 $0.007–0.014 vs 普通输入 $0.22–0.44 vs 输出 $0.66–1.32；GLM-5.2：$0.26 / $1.40 / $4.40；Kimi K3：$0.30 / $3.00 / $15.00；GPT-5.6 Luna：$0.02 / $0.20 / $1.20；GPT-5.6 Sol：$0.40 / $4.00 / $20.00；Claude Opus 5：$0.50 / $5.00 / $25.00。规律：**缓存命中 token 的价格大约是普通输入的 1/10，而输出大约是输入的 5 倍——输出与缓存输入之间差约 50 倍**。
 
-![Cached-token API pricing：六家模型的缓存输入/普通输入/输出价格对照，缓存价约为输入价的 1/10（2026-08-30 核价）（视频 55:05）](shots3/caching-cost.png)
+![Cached-token API pricing：六家模型的缓存输入/普通输入/输出价格对照，缓存价约为输入价的 1/10（2026-08-30 核价）（视频 55:05）](shots/03/caching-cost.png)
 
 好的缓存命中率是多少？课堂讨论给出的数字是 80–95%，Neubig 的口径是 **90–95% 算健康，低于这个数多半在哪个环节漏了**。
 
@@ -186,7 +186,7 @@ Neubig 随后让学生现身说法："你们长时间用智能体时见过什么
 
 Neubig 给了一个形式化视角：**压缩即状态估计（compaction as state estimation）**。把完整历史 H_t 交给压缩器 C，产出工作状态 ŝ_t，要同时满足三个条件：**行为保真（behavioral fidelity）**——基于 ŝ_t 的未来动作分布应近似于基于完整历史的未来动作分布（一样、相似、甚至更好）；**有界表示（bounded representation）**——ŝ_t 的大小受 token 预算 B 约束；**可恢复性（recoverability）**——保留精确锚点（anchors）的副本和指向源证据的指针。
 
-![Compaction as state estimation：历史经压缩器变为有界工作状态，需满足行为保真、有界表示、可恢复性（视频 67:40）](shots3/compaction.png)
+![Compaction as state estimation：历史经压缩器变为有界工作状态，需满足行为保真、有界表示、可恢复性（视频 67:40）](shots/03/compaction.png)
 
 **什么内容在压缩后存活？** 常见策略：保留**锚点**——比如会话最开始用户说的话（"智能体忘了开头的话"有时其实是 harness 的设计 bug：好的 harness 会有意保护开头，因为它们更重要）；中间部分编码成摘要放回上下文；**最近的尾巴**（recent tail）通常原样保留。另外，证据通常进入**证据库（evidence store）**：至少 CLI 编程智能体会把完整历史存在磁盘上——只要你知道路径，就算压缩丢了内容，也可以让智能体自己去读历史文件找回来；当然也有更结构化的做法。
 

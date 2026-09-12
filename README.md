@@ -1,13 +1,16 @@
-# CMU AI Agents 2026 · 阅读笔记
+# Read · 视频阅读版笔记库
 
-CMU CS 11-768「AI Agents」（Fall 2026，Graham Neubig / Daniel Fried）课程视频的阅读版长文。每篇按主题分节展开，小节标题旁附视频时间戳跳转链接，关键课件画面配有高清截图。
+把视频内容改写为"阅读版"长文的合集。每个视频系列（课程、播放列表、专题）一个子目录。
 
-| 讲次 | 主题 | 主讲 |
+## 系列索引
+
+| 系列 | 目录 | 篇数 |
 | --- | --- | --- |
-| [第 1 讲](CMU%20AI%20Agents%202026%20-%201.%20What%20are%20Agents%20and%20How%20Do%20They%20Work.md) | What are Agents and How Do They Work? | Daniel Fried & Graham Neubig |
-| [第 2 讲](CMU%20AI%20Agents%202026%20-%202.%20Tool%20Use%20for%20Language%20Model%20Agents.md) | Tool Use for Language Model Agents | Graham Neubig |
-| [第 3 讲](CMU%20AI%20Agents%202026%20-%203.%20Long%20Context%20Modeling%20for%20Agents.md) | Long Context Modeling for Agents | Graham Neubig |
-| [第 4 讲](CMU%20AI%20Agents%202026%20-%204.%20Memory%20and%20Skills%20for%20Agents.md) | Memory and Skills for Agents | Daniel Fried |
+| CMU CS 11-768 AI Agents（Fall 2026） | [cmu-ai-agents-2026](cmu-ai-agents-2026/) | 4 |
 
-- 原始播放列表：[CMU 11-768, AI Agents: Fall 2026](https://www.youtube.com/playlist?list=PLSN0qpDfUvTM)
-- 配图目录：`shots1/` ~ `shots4/` 分别对应第 1~4 讲的课件截图。
+## 目录组织规范
+
+- 每个系列一个子目录，目录名用该系列的小写连字符标识（如 `cmu-ai-agents-2026`）。
+- 系列目录内：文稿 Markdown 平铺在根层，文件名以讲次/集数开头排序。
+- 配图统一放在系列目录下的 `shots/<编号>/`，编号与文稿讲次对应（如 `shots/03/` 是第 3 讲的截图）；文稿内一律使用相对路径引用。
+- 新增系列时：建子目录、放文稿与 `shots/`，并在本文件的「系列索引」表中加一行。

@@ -88,7 +88,7 @@ Daniel 强调 Agent 不是这两三年的新概念——"agent 的概念以及�
 - **tools 列表**：用前述规范格式表示的全部可用工具；
 - **history**：Agent 至今交互中产出的动作与观测到的结果的历史记录。
 
-![课件：An agent is a model in a loop —— Context/Task/Tool/History 输入模型，经 Reasoning 产生 Call（25:30）](shots1/shot4-react.jpg)
+![课件：An agent is a model in a loop —— Context/Task/Tool/History 输入模型，经 Reasoning 产生 Call（25:30）](shots/01/shot4-react.jpg)
 
 在每个时间步，模型以所有这些为条件，先产出一段关于"该做什么"的推理链（带草稿纸的思维链），再产出一个或多个用于与环境或用户交互的 tool calls；环境执行工具调用后把结果追加进 history，同时环境状态被更新；模型再以更新后的历史与本步观测为条件，发出新的工具调用，如此往复。还可以设置"终止型"工具调用——比如给用户发消息、或以其他方式显式发出完成信号（planning 一讲会专门讨论"模型如何判断自己做完了"，此处不展开）。
 
@@ -111,7 +111,7 @@ Graham 接过下半场，先点题：什么叫"好的 Agent"？正如 Daniel 展
 - 可能对你撒谎；
 - 充满隐式假设（implicit assumptions）。
 
-![课件：Agent capabilities 六项能力列表逐条展开（34:10）](shots1/shot5-capabilities.jpg)
+![课件：Agent capabilities 六项能力列表逐条展开（34:10）](shots/01/shot5-capabilities.jpg)
 
 随后他给出幻灯片上的六项能力，并逐一点评：
 
@@ -150,7 +150,7 @@ Graham 把六项能力逐项拆开，给出课程会覆盖的具体技术手段�
 
 Graham 强调这门课想反复灌输的一点：**Agent 是系统，不只是模型**，它比你之前在任何机器学习课里处理过的东西都复杂得多。
 
-![课件：Agents are systems, not just models —— Sandbox 包裹 Harness，经 Inference 连接 Model（53:00）](shots1/shot6-systems.jpg)
+![课件：Agents are systems, not just models —— Sandbox 包裹 Harness，经 Inference 连接 Model（53:00）](shots/01/shot6-systems.jpg)
 
 他列出五大组件及课程会讲到的代表软件：
 
