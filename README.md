@@ -7,6 +7,7 @@
 | 系列 | 目录 | 篇数 |
 | --- | --- | --- |
 | CMU CS 11-768 AI Agents（Fall 2026） | [cmu-ai-agents-2026](cmu-ai-agents-2026/) | 4 |
+| 《Let's Go》中文版 | [lets-go](lets-go/) | 94 章 + 学习指南 |
 
 ## 目录组织规范
 
